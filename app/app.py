@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
-from agent import chatbot
+from .agent import chatbot
+
+
 class chatRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
