@@ -4,7 +4,7 @@ import uuid
 from pathlib import Path
 from dotenv import load_dotenv
 from litellm import completion
-from prompts import CHATBOT_SYSTEM_PROMPT, ROUTER_SYSTEM_PROMPT
+from .prompts import CHATBOT_SYSTEM_PROMPT, ROUTER_SYSTEM_PROMPT
 
 load_dotenv()
 
