@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 from litellm import completion
 from .prompts import CHATBOT_SYSTEM_PROMPT, ROUTER_SYSTEM_PROMPT
 
-load_dotenv()
+dotenv_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(dotenv_path=dotenv_path)
 
 SESSIONS_DIR = Path("sessions")
 SESSIONS_DIR.mkdir(exist_ok=True)

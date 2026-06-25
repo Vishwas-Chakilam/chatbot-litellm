@@ -1,2 +1,26 @@
+# Byte-compiled / optimized / DLL files
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Environments and Secrets
+.env
+.env.*
 app/.env
-__pycache__/
+
+# Application specific
+sessions/
+app/sessions/
+/sessions/
+/app/sessions/
+*.pdf
+
+# OS metadata
+.DS_Store
+Thumbs.db
