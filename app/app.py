@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from .core.models import chatRequest
-from .memory.session_manager import SESSIONS_DIR
+from .memory.session_manager import SESSIONS_DIR, load_history
 from .agent import chatbot
 
-app = FastAPI(title="Chatbot API", version="1.0.0", description="A simple chatbot API using FastAPI and Litellm.")
+app = FastAPI(title="Chatbot API", version="2.0.0", description="A simple chatbot API using FastAPI and Litellm.")
 
 @app.get("/", tags=["General"])
 def read_root():
@@ -48,3 +48,16 @@ def delete_session(session_id: str):
         return {"error": "Session not found"}
     session_file.unlink()
     return {"message": f"{session_id} deleted"}
+
+@app.get("/cost", tags=["Admin"])
+def get_totalcostofallqueries():
+    return {"this is yet to implement soon!": "LITELLM CHATBOT"}
+
+@app.get("/getjson/{session_id}", tags=["Admin"])
+def get_session_json(session_id: str):
+    history = load_history(session_id)
+    if not history:
+        session_file = SESSIONS_DIR / f"{session_id}.json"
+        if not session_file.exists():
+            return {"error": "Session not found"}
+    return {"session_id": session_id, "history": history}

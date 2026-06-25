@@ -23,7 +23,8 @@ def chatbot(message: str, session_id: str = None) -> tuple[str, str]:
     history = load_history(session_id)
 
     # 1. Run Input Guardrail Check (L1)
-    if not check_input_safety(message, history):
+    is_safe, risk_level = check_input_safety(message, history)
+    if not is_safe:
         return "I cannot fulfill this request. It violates my safety guidelines.", session_id
 
     # 2. Check for fast static responses
@@ -34,8 +35,9 @@ def chatbot(message: str, session_id: str = None) -> tuple[str, str]:
         save_history(session_id, history)
         return reply, session_id
 
-    # 3. Mitigate multi-turn context poisoning (L2)
-    history = defend_history_poisoning(history)
+    # 3. Mitigate multi-turn context poisoning (L2) ONLY if risk level is elevated (MEDIUM)
+    if risk_level == "MEDIUM":
+        history = defend_history_poisoning(history)
 
     # 4. Route model selection based on intent classification
     model, api_key = choose_model(message)

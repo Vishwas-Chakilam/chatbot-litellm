@@ -3,15 +3,17 @@ from litellm import completion
 from ..core.prompts import GUARDRAIL_SYSTEM_PROMPT, OUTPUT_GUARDRAIL_SYSTEM_PROMPT
 from ..core.config import get_env_var
 
-def check_input_safety(message: str, history: list) -> bool:
+def check_input_safety(message: str, history: list) -> tuple[bool, str]:
     """
     Input Guardrail (L1): Checks the user message (with recent context) for safety violations.
-    Returns True if SAFE, False if UNSAFE.
+    Returns: (is_safe, risk_level)
+      - is_safe: False if UNSAFE, True otherwise.
+      - risk_level: "LOW", "MEDIUM", or "HIGH"
     """
     model = get_env_var("FAST_MODEL_1")
     api_key = get_env_var("FAST_API_KEY_1")
     if not model or not api_key:
-        return True
+        return True, "LOW"
 
     # Build a context snippet from the last 2 assistant-user turns to check for Crescendo drift
     recent_context = []
@@ -29,16 +31,19 @@ def check_input_safety(message: str, history: list) -> bool:
                 {"role": "system", "content": GUARDRAIL_SYSTEM_PROMPT},
                 {"role": "user", "content": eval_message}
             ],
-            max_tokens=10,
+            max_tokens=15,
             temperature=0.0
         )
         decision = response.choices[0].message.content.strip().upper()
         if "UNSAFE" in decision:
-            return False
+            return False, "HIGH"
+        elif "SAFE_MEDIUM" in decision:
+            return True, "MEDIUM"
+        else:
+            return True, "LOW"
     except Exception as e:
         print(f"Input safety validation bypassed due to error: {e}")
-        return True
-    return True
+        return True, "LOW"
 
 def defend_history_poisoning(history: list) -> list:
     """
